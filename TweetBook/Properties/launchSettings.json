@@ -10,6 +10,7 @@
   "profiles": {
     "TweetBook": {
       "commandName": "Project",
+      "launchUrl" : "swagger",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
