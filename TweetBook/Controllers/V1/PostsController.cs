@@ -6,26 +6,40 @@ using TweetBook.Contracts.V1;
 using TweetBook.Contracts.V1.Requests;
 using TweetBook.Contracts.V1.Responses;
 using TweetBook.Domain;
+using TweetBook.Services;
 
 namespace TweetBook.Controllers.V1
 {
     public class PostsController : Controller
     {
+        private readonly IPostService _postService;
 
-        public PostsController()
+        public PostsController(IPostService postService)
         {
+            _postService = postService;
         }
 
         [HttpGet(ApiRoutes.Posts.GetAll)]
         public IActionResult GetAll()
         {
-            return Ok(_posts);
+            return Ok(_postService.GetPosts());
+        }
+
+        [HttpDelete(ApiRoutes.Posts.Delete)]
+        public IActionResult Delete([FromRoute]Guid postId)
+        {
+            var deleted = _postService.DeletePost(postId);
+
+            if (deleted)
+                return NoContent();
+
+            return NotFound();
         }
 
         [HttpGet(ApiRoutes.Posts.Get)]
         public IActionResult Get([FromRoute]Guid postId)
         {
-            var post = _posts.SingleOrDefault(p => p.Id == postId);
+            var post = _postService.GetPostById(postId);
 
             if (post == null)
                 return NotFound();
@@ -34,21 +48,44 @@ namespace TweetBook.Controllers.V1
         }
 
         [HttpPost(ApiRoutes.Posts.Create)]
-        public IActionResult Create([FromBody]CreatePostRequest postRequest)
+        public IActionResult Create([FromBody]CreatePostRequest request)
         {
-            var post = new Post { Id = postRequest.Id };
+            var post = new Post
+            {
+                Id = request.Id,
+                Name = request.Name
+            };
 
             if (post.Id == Guid.Empty)
-                postRequest.Id = Guid.NewGuid();
+                request.Id = Guid.NewGuid();
 
-            _posts.Add(post);
+            //_posts.Add(post);
+
+            _postService.CreatePost(post);
 
             var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.ToUriComponent()}";
-            var locationUri = baseUrl + ApiRoutes.Posts.Get.Replace("{postId}", postRequest.Id.ToString());
+            var locationUri = baseUrl + ApiRoutes.Posts.Get.Replace("{postId}", request.Id.ToString());
 
             var response = new PostResponse { Id = post.Id };
 
             return Created(locationUri, response);
+        }
+
+        [HttpPut(ApiRoutes.Posts.Update)]
+        public IActionResult Update([FromRoute]Guid postId, [FromBody]UpdatePostRequest request)
+        {
+            var post = new Post
+            {
+                Id = postId,
+                Name = request.Name
+            };
+
+            var updated = _postService.UpdatePost(post);
+
+            if (updated)
+                return Ok(post);
+
+            return NotFound();
         }
     }
 }
