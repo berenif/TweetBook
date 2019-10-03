@@ -35,15 +35,16 @@ namespace TweetBook
                 app.UseHsts();
             }
 
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+
             var swaggerOptions = new Options.SwaggerOptions();
 
-            Configuration.GetSection(nameof(SwaggerOptions)).Bind(swaggerOptions);
+            Configuration.GetSection(nameof(Options.SwaggerOptions)).Bind(swaggerOptions);
 
             app.UseSwagger(option => { option.RouteTemplate = swaggerOptions.JsonRoute; });
             app.UseSwaggerUI(option => { option.SwaggerEndpoint(swaggerOptions.UIEndpoint, swaggerOptions.Description); });
-
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
+            app.UseAuthentication();
 
             app.UseMvc();
         }
