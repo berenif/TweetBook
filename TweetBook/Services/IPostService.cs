@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TweetBook.Domain;
 
 namespace TweetBook.Services
 {
     public interface IPostService
     {
-        List<Post> GetPosts();
+        Task<List<Post>> GetPostsAsync();
 
-        Post GetPostById(Guid postId);
+        Task<Post> GetPostByIdAsync(Guid postId);
 
-        bool UpdatePost(Post postToUpdate);
+        Task<bool> UpdatePostAsync(Post postToUpdate);
 
-        bool DeletePost(Guid postId);
+        Task<bool> DeletePostAsync(Guid postId);
 
-        bool CreatePost(Post postToCreate);
+        Task<bool> CreatePostAsync(Post postToCreate);
     }
 }
