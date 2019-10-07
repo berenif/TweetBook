@@ -7,6 +7,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using System.Collections.Generic;
 using System.Text;
 using TweetBook.Options;
+using TweetBook.Services;
 
 namespace TweetBook.Installers
 {
@@ -18,6 +19,7 @@ namespace TweetBook.Installers
             configuration.Bind(nameof(jwtOptions), jwtOptions);
 
             services.AddSingleton(jwtOptions);
+            services.AddScoped<IIdentityService, IdentityService>();
 
             services.AddAuthentication(x =>
             {
