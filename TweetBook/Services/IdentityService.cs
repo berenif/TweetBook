@@ -13,10 +13,10 @@ namespace TweetBook.Services
 {
     public class IdentityService : IIdentityService
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<User> _userManager;
         private readonly JwtOptions _jwtOptions;
 
-        public IdentityService(UserManager<IdentityUser> userManager, JwtOptions jwtOptions)
+        public IdentityService(UserManager<User> userManager, JwtOptions jwtOptions)
         {
             _userManager = userManager;
             _jwtOptions = jwtOptions;
@@ -34,7 +34,7 @@ namespace TweetBook.Services
                 };
             }
 
-            var newUser = new IdentityUser
+            var newUser = new User
             {
                 Email = email,
                 UserName = email
@@ -53,7 +53,7 @@ namespace TweetBook.Services
             return GenerateAuthenticationResultForUser(newUser);
         }
 
-        private AuthenticationResult GenerateAuthenticationResultForUser(IdentityUser newUser)
+        private AuthenticationResult GenerateAuthenticationResultForUser(User newUser)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_jwtOptions.Secret);
@@ -64,7 +64,7 @@ namespace TweetBook.Services
                     new Claim(JwtRegisteredClaimNames.Sub, newUser.Email),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(JwtRegisteredClaimNames.Email, newUser.Email),
-                    new Claim("id", newUser.Id),
+                    new Claim("id", newUser.Id.ToString()),
                 }),
                 Expires = DateTime.UtcNow.AddHours(2),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)

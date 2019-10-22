@@ -6,6 +6,19 @@
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Data\Migrations\00000000000000_CreateIdentitySchema.cs" />
+    <Compile Remove="Data\Migrations\00000000000000_CreateIdentitySchema.Designer.cs" />
+    <Compile Remove="Data\Migrations\20191001141058_AddedPosts.cs" />
+    <Compile Remove="Data\Migrations\20191001141058_AddedPosts.Designer.cs" />
+    <Compile Remove="Data\Migrations\20191007133534_Post_UserId.cs" />
+    <Compile Remove="Data\Migrations\20191007133534_Post_UserId.Designer.cs" />
+    <Compile Remove="Data\Migrations\20191007134207_Post_UserId.cs" />
+    <Compile Remove="Data\Migrations\20191007134207_Post_UserId.Designer.cs" />
+    <Compile Remove="Data\Migrations\20191007134733_Add_Posts.cs" />
+    <Compile Remove="Data\Migrations\20191007134733_Add_Posts.Designer.cs" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />

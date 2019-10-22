@@ -7,6 +7,7 @@ using TweetBook.Contracts.V1;
 using TweetBook.Contracts.V1.Requests;
 using TweetBook.Contracts.V1.Responses;
 using TweetBook.Domain;
+using TweetBook.Extensions;
 using TweetBook.Services;
 
 namespace TweetBook.Controllers.V1
@@ -27,17 +28,6 @@ namespace TweetBook.Controllers.V1
             return Ok(await _postService.GetPostsAsync());
         }
 
-        [HttpDelete(ApiRoutes.Posts.Delete)]
-        public async Task<IActionResult> Delete([FromRoute]Guid postId)
-        {
-            var deleted = await _postService.DeletePostAsync(postId);
-
-            if (deleted)
-                return NoContent();
-
-            return NotFound();
-        }
-
         [HttpGet(ApiRoutes.Posts.Get)]
         public async Task<IActionResult> Get([FromRoute]Guid postId)
         {
@@ -54,7 +44,8 @@ namespace TweetBook.Controllers.V1
         {
             var post = new Post
             {
-                Name = request.Name
+                Name = request.Name,
+                UserId = HttpContext.GetUserId()
             };
 
             await _postService.CreatePostAsync(post);
@@ -70,16 +61,38 @@ namespace TweetBook.Controllers.V1
         [HttpPut(ApiRoutes.Posts.Update)]
         public async Task<IActionResult> Update([FromRoute]Guid postId, [FromBody]UpdatePostRequest request)
         {
-            var post = new Post
+            var userOwnsPost = await _postService.UserOwnsPost(postId, HttpContext.GetUserId());
+
+            if (!userOwnsPost)
             {
-                Id = postId,
-                Name = request.Name
-            };
+                return BadRequest(new { Error = "You do not own the post" });
+            }
+
+            var post = await _postService.GetPostByIdAsync(postId);
+            post.Name = request.Name;
 
             var updated = await _postService.UpdatePostAsync(post);
 
             if (updated)
                 return Ok(post);
+
+            return NotFound();
+        }
+
+        [HttpDelete(ApiRoutes.Posts.Delete)]
+        public async Task<IActionResult> Delete([FromRoute]Guid postId)
+        {
+            var userOwnsPost = await _postService.UserOwnsPost(postId, HttpContext.GetUserId());
+
+            if (!userOwnsPost)
+            {
+                return BadRequest(new { Error = "You do not own the post" });
+            }
+
+            var deleted = await _postService.DeletePostAsync(postId);
+
+            if (deleted)
+                return NoContent();
 
             return NotFound();
         }
