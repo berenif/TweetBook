@@ -15,6 +15,8 @@ namespace TweetBook.Data
 
         public DbSet<Post> Posts { get; set; }
 
+        public DbSet<RefreshToken> RefreshToken { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
